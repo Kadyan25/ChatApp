@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatApp - Chat</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div class="app-header">
+        <h2>ChatApp</h2>
+        <span id="currentUser"></span>
+    </div>
+
+    <div class="chat-layout">
+        <!-- Sidebar: rooms -->
+        <div class="sidebar">
+            <h3>Rooms</h3>
+            <ul id="roomList"></ul>
+
+            <div class="form-section" style="margin-top:12px;">
+                <h3 style="font-size:14px;">Private (debug)</h3>
+                <div class="form-group">
+                    <label for="privateReceiverId">Receiver userId</label>
+                    <input type="number" id="privateReceiverId" placeholder="e.g. 2">
+                </div>
+                <div class="form-group">
+                    <label for="privateMessageInput">Private message</label>
+                    <input type="text" id="privateMessageInput" placeholder="Type private message">
+                </div>
+                <button onclick="sendPrivateMessage()">Send Private</button>
+            </div>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="chat-main">
+            <div class="chat-main-header">
+                <h3>Current room: <span id="currentRoomName">None</span></h3>
+            </div>
+
+            <div id="messages" class="messages-box"></div>
+
+            <div class="chat-input-row">
+                <input type="text" id="messageInput" placeholder="Type a message">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="/auth.js"></script>
+<script src="/chat.js"></script>
+</body>
+</html>
