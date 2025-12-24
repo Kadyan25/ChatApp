@@ -1,9 +1,26 @@
+# application.yml
+
+# COMMON SETTINGS (apply to all profiles)
 server:
   port: 8080
 
 spring:
   application:
     name: ChatApp
+  profiles:
+    active: local    # default when you run on your PC
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.springframework.web: info
+
+---
+# LOCAL PROFILE → MySQL
+spring:
+  config:
+    activate:
+      on-profile: local
 
   datasource:
     url: jdbc:mysql://localhost:3306/ChatApp?createDatabaseIfNotExist=true
@@ -23,7 +40,33 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
 
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.springframework.web: info
+---
+# RENDER PROFILE → H2 (in-memory, no permanent data)
+spring:
+  config:
+    activate:
+      on-profile: render
+
+  datasource:
+    url: jdbc:h2:mem:chatdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        hibernate.dialect: org.hibernate.dialect.H2Dialect
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false

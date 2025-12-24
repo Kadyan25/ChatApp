@@ -23,6 +23,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())   // allow H2 iframe
+                    )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                 		.requestMatchers(
@@ -37,7 +40,8 @@ public class SecurityConfig {
                 		        "/js/**",
                 		        "/images/**",
                 		        "/webjars/**",
-                		        "/style.css"
+                		        "/style.css",
+                		        "/h2-console/**"
                 		).permitAll()
 
                         .anyRequest().authenticated()
