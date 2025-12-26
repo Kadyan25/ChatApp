@@ -90,9 +90,14 @@ function sendPrivateMessage() {
 
 function showMessage(msg) {
     const messagesEl = document.getElementById('messages');
-    const line = `[${msg.timestamp}] ${msg.senderUsername || 'Unknown'}: ${msg.content}\n`;
+    const time = new Date(msg.timestamp).toLocaleTimeString(
+        navigator.language,
+        { hour: 'numeric', minute: '2-digit' }
+    );
+    const line = `[${time}] ${msg.senderUsername || 'Unknown'}: ${msg.content}\n`;
     messagesEl.textContent += line;
 }
+
 function getAuth() {
     return {
         userId: Number(localStorage.getItem('userId')),
@@ -134,30 +139,37 @@ async function loadRooms() {
         selectRoom(rooms[0].id, rooms[0].name);
     }
 }
+async function selectRoom(roomId, roomName) {
+    currentRoomId = roomId;
+    document.getElementById('currentRoomName').textContent = roomName;
 
-async function loadRooms() {
+    if (currentSubscription) {
+        currentSubscription.unsubscribe();
+        currentSubscription = null;
+    }
+
+    const messagesEl = document.getElementById('messages');
+    messagesEl.textContent = '';
+
     const auth = getAuth();
-    const resp = await fetch('/api/rooms', {
-        headers: {
-            'Authorization': 'Bearer ' + auth.token
+    try {
+        const resp = await fetch(`/api/rooms/${roomId}/messages`, {
+            headers: { 'Authorization': 'Bearer ' + auth.token }
+        });
+        if (resp.ok) {
+            const history = await resp.json(); // List<MessageDto>
+            history.forEach(m => showMessage(m)); // works as showMessage expects timestamp, senderUsername, content
+        } else {
+            console.error('Failed to load room history', resp.status);
         }
-    });
-    const rooms = await resp.json();
+    } catch (e) {
+        console.error('Error loading room history', e);
+    }
 
-    const listEl = document.getElementById('roomList');
-    listEl.innerHTML = '';
-
-    rooms.forEach(room => {
-        const li = document.createElement('li');
-        li.textContent = room.name + ' (id=' + room.id + ')';
-        li.style.cursor = 'pointer';
-        li.onclick = () => selectRoom(room.id, room.name);
-        listEl.appendChild(li);
-    });
-
-    if (rooms.length > 0 && currentRoomId === null) {
-        selectRoom(rooms[0].id, rooms[0].name);
+    if (stompClient && stompClient.connected) {
+        currentSubscription = stompClient.subscribe(
+            '/topic/room.' + roomId,
+            msg => showMessage(JSON.parse(msg.body)) // also MessageDto
+        );
     }
 }
-
-window.addEventListener('load', connect);

@@ -1,186 +1,277 @@
-Chat Application with User Authentication
-This project is a full-stack real-time chat application .It implements secure user authentication, public chat rooms, and private messaging, using a modern Java backend and a simple, responsive web UI.
- 
-1. Project Overview
+# ChatApp – Real-Time Chat with User Authentication
+
+ChatApp is a full‑stack real‑time chat application that demonstrates secure user authentication, public chat rooms, private messaging, and online presence using a modern Java backend and a simple, responsive web UI [web:54][web:277].
+
+---
+
+## 1. Project Overview
+
 The application allows users to:
-•	Register and log in with a unique username and email.
-•	Join public chat rooms and exchange messages in real time.
-•	Send private messages to specific users.
-•	View chat history for rooms and private conversations.
-The focus is on demonstrating full-stack skills: frontend (HTML/CSS/JS), backend (Spring Boot), database design (MySQL + JPA/Hibernate), REST APIs, real-time communication with WebSockets, and secure authentication using JWT + Spring Security.
- 
-2. Tech Stack
-Backend
-•	Java 17+
-•	Spring Boot 3 (Web, Security, WebSocket, Spring Data JPA)
-•	MySQL as relational database
-•	Hibernate / JPA for ORM
-•	JWT for stateless authentication and authorization
-Frontend
-•	HTML5
-•	CSS3 (custom, responsive with Flexbox)
-•	Vanilla JavaScript (no framework)
-•	SockJS + STOMP for WebSocket communication
- 
-3. Features vs Assignment Requirements
-Below is how this project maps to the internship assignment points.
 
-3.1 User Interface (HTML/CSS/JS)
-•	Login & Registration Page (index.html)
-o	Contains separate sections for registration and login, with simple tab-like buttons to switch between them.
-o	Uses clean HTML forms, semantic labels, and a shared stylesheet (style.css) for layout and styling.
-•	Chat Page (chat.html)
-o	Layout split into sidebar (room list + private message section) and main chat area (current room title, history, message input).
-o	Responsive design using CSS flexbox and media queries; adjusts to smaller screens by stacking sections vertically.
+- Register and log in with a unique username and email.
+- Join public chat rooms and exchange messages in real time.
+- Send private messages to specific users.
+- View chat history for rooms and private conversations.
+- See which users are currently online (simple in‑memory tracking).
 
+The focus is on showcasing full‑stack skills: frontend (HTML/CSS/JS), backend (Spring Boot), relational database design (MySQL + JPA/Hibernate), REST APIs, real‑time communication with WebSockets, and secure authentication using JWT + Spring Security [web:54][web:62].
 
-3.2 Responsive and Accessible Design
-•	Uses a centered card-style container with clear typography and contrast.
-•	Layout degrades gracefully on smaller screens using media queries (sidebar moves above chat area).
-•	Basic accessibility practices: label–input pairs, consistent font size, and no complex custom widgets.
+---
 
+## 2. Tech Stack
 
-3.3 Real-Time Messaging (WebSockets)
-•	Real-time communication implemented using Spring WebSocket with STOMP.
-•	Server exposes a STOMP endpoint at /ws.
-•	Clients connect using SockJS + STOMP and:
-o	Send messages to /app/chat.send.
-o	Subscribe to /topic/room.{roomId} for public room updates.
-o	Subscribe to /queue/user.{userId} for private messages.
+### Backend
 
+- Java 17+
+- Spring Boot 3
+  - Spring Web
+  - Spring Security
+  - Spring WebSocket (STOMP over SockJS)
+  - Spring Data JPA
+- MySQL (local profile) and H2 in‑memory (render profile)
+- Hibernate / JPA for ORM
+- JWT for stateless authentication and authorization [web:191][web:272]
 
-3.4 Server-Side Logic (Java + Spring Boot)
-•	Backend built on Spring Boot with layered architecture:
-o	entity for JPA entities (User, ChatRoom, Message).
-o	repository for Spring Data JPA repositories.
-o	service for business logic (auth, chat, message handling).
-o	controller for REST endpoints and WebSocket controllers.
+### Frontend
 
+- HTML5
+- CSS3 (custom, responsive with Flexbox)
+- Vanilla JavaScript (no framework)
+- SockJS + STOMP for WebSocket communication [web:54][web:277]
 
-3.5 RESTful APIs
+### Infrastructure
+
+- Maven for build and dependency management
+- Docker for containerization
+- Profiles via `SPRING_PROFILES_ACTIVE` for environment‑specific configuration (local vs render) [web:282][web:288]
+
+---
+
+## 3. Features and Architecture
+
+### 3.1 User Interface (HTML/CSS/JS)
+
+- **Login & Registration (`index.html`)**
+  - Single page with sections for registration and login.
+  - Simple tab‑like buttons switch between the two forms.
+  - Shared stylesheet (`style.css`) for layout, typography, and responsive design.
+
+- **Room Chat (`chat.html`)**
+  - Sidebar: list of public rooms and a minimal “Private (debug)” area to send a private message by receiver userId.
+  - Main area: shows current room name, message history, and message input at the bottom.
+  - Responsive layout using flexbox; sidebar stacks above the chat area on smaller screens [web:63].
+
+- **Private Chat (`private.html`)**
+  - Dedicated UI for one‑to‑one conversations.
+  - Sidebar: input for peer userId and “Load history” button, plus an online users section.
+  - Main area: conversation header, message history, and input box for private messages.
+
+The UI prioritizes clarity and basic responsiveness over advanced styling or animations [web:63][web:137].
+
+### 3.2 Real-Time Messaging (WebSockets)
+
+- WebSocket endpoint at `/ws` configured via Spring WebSocket with SockJS fallback.
+- STOMP used as the messaging protocol:
+  - Clients **send** messages to `/app/chat.send`.
+  - Clients **subscribe** to:
+    - `/topic/room.{roomId}` – public room broadcasts.
+    - `/queue/user.{userId}` – private messages to individual users [web:13][web:277].
+- Room and private messages are persisted in the database and delivered in real time to connected clients.
+
+### 3.3 Backend Structure (Spring Boot)
+
+Package‑level architecture:
+
+- `entity` – JPA entities:
+  - `User` – id, username, email, password (BCrypt hash), createdAt.
+  - `ChatRoom` – id, name, type (`PUBLIC`, `PRIVATE`), createdAt.
+  - `Message` – id, sender (User), optional receiver (User for private messages), optional room (ChatRoom), content, timestamp.
+- `repository` – Spring Data JPA repositories:
+  - `UserRepository` – `findByUsername`, `findByEmail`, `existsByUsername`, `existsByEmail`.
+  - `ChatRoomRepository` – `findByType(ChatRoomType.PUBLIC)`.
+  - `MessageRepository` – methods to fetch:
+    - Room history ordered by timestamp.
+    - Bidirectional private conversation between two users ordered by timestamp.
+- `service` – business logic:
+  - `UserService` – registration and authentication.
+  - `ChatService` – room listing, message persistence, room/private history, user ID lookup.
+- `controller` – REST and WebSocket controllers:
+  - `AuthController` – `/api/auth/**` for register/login.
+  - `ChatController` – `/api/rooms/**` for room and private histories, REST message send.
+  - `ChatWebSocketController` – STOMP endpoints (`/app/chat.send`) for live messaging.
+  - `UserController` – `/api/users/**` for current user info and online users.
+
+This layered structure follows standard Spring Boot chat application patterns [web:54][web:289].
+
+### 3.4 RESTful APIs
+
 Key REST endpoints:
-•	Auth
-o	POST /api/auth/register – user registration.
-o	POST /api/auth/login – user login, returns JWT token and user info.
-•	User
-o	GET /api/users/me – current user info (JWT-protected).
-o	GET /api/users/online – returns IDs of users marked as online (simple tracker).
-•	Rooms & Messages
-o	GET /api/rooms – list of chat rooms (public and, internally, private if used).
-o	GET /api/rooms/{roomId}/messages – history for a specific room.
-o	POST /api/rooms/messages – send a message via REST (stored and then can be fetched).
-o	GET /api/rooms/private/{otherUserId}/messages – 1‑to‑1 conversation history between current user and another user.
 
+- **Auth**
+  - `POST /api/auth/register` – user registration.
+  - `POST /api/auth/login` – user login, returns JWT token and user info.
 
-3.6 Authentication & Authorization (JWT + Spring Security)
-•	User passwords are hashed using BCrypt (PasswordEncoder).
-•	On login, a JWT token is generated containing user id and username, with a finite expiration time.
-•	Spring Security is configured with a stateless SecurityFilterChain and a custom JwtAuthenticationFilter that:
-o	Extracts token from Authorization: Bearer <token>.
-o	Validates token and sets the authentication in the security context.
-•	REST APIs under /api/** (except /api/auth/** and static assets) require a valid JWT.
+- **User**
+  - `GET /api/users/me` – current user info, derived from JWT.
+  - `GET /api/users/online` – IDs of users currently tracked as online by `OnlineUserTracker`.
 
+- **Rooms & Messages**
+  - `GET /api/rooms` – list of public chat rooms.
+  - `GET /api/rooms/{roomId}/messages` – message history for a specific room.
+  - `POST /api/rooms/messages` – send a message via REST (public or private depending on payload).
+  - `GET /api/rooms/private/{otherUserId}/messages` – private conversation history between current user and another user.
 
-3.7 Relational Database Design (MySQL)
-Entities and schema:
-•	User
-o	id, username, email, password, createdAt.
-•	ChatRoom
-o	id, name, type (PUBLIC, PRIVATE), createdAt.
-•	Message
-o	id, sender (FK to User), receiver (FK to User, nullable for public), room (FK to ChatRoom or nullable depending on configuration), content, timestamp.
-The schema is created/updated via JPA/Hibernate (ddl-auto=update) during development.
+All non‑auth API endpoints are protected by JWT‑based authentication [web:191][web:272].
 
+### 3.5 Authentication & Authorization (JWT + Spring Security)
 
-3.8 JPA / Hibernate Usage
-•	Repositories use Spring Data JPA interfaces, e.g.:
-o	UserRepository with findByUsername, existsByEmail, etc.
-o	MessageRepository with methods for fetching room history and user-to-user history (ordered by timestamp).
-•	Entities use standard JPA annotations (@Entity, @Id, @GeneratedValue, @ManyToOne, etc.) and Lombok to reduce boilerplate.
-3.9 Real-Time Notifications / In-App Alerts
-•	Real-time “notification” behavior is provided via WebSocket subscriptions:
-o	When a new message arrives in a room, all clients subscribed to that room’s topic immediately see the update in the chat area.
-o	When a new private message is sent, both the sender and receiver get it in their personal queues (subscribed at /queue/user.{userId}).
-3.10 Data Security
-•	Passwords are hashed with BCrypt; plain passwords are never stored.
-•	All authenticated API calls use JWT, and access to protected endpoints is controlled by Spring Security.
-•	For deployment, the app is intended to run behind HTTPS so WebSocket and REST traffic are encrypted in transit (this is mentioned as a recommendation in documentation; local dev uses HTTP).
- 
+- Passwords are hashed with BCrypt (`PasswordEncoder`).
+- On login, a JWT is generated containing:
+  - Subject: user ID.
+  - Claim: username.
+  - Issued and expiration times.
+- A custom `JwtAuthenticationFilter`:
+  - Extracts the token from the `Authorization: Bearer <token>` header.
+  - Validates the token and loads the corresponding user.
+  - Populates `SecurityContext` with a `UsernamePasswordAuthenticationToken`.
+- `SecurityConfig`:
+  - Disables CSRF for simplicity.
+  - Permits access to:
+    - `/api/auth/**`
+    - `/ws/**`
+    - Static assets (`index.html`, `chat.html`, `private.html`, JS, CSS, images, `/webjars/**`, `/h2-console/**`).
+  - Requires authentication for all other API endpoints.
 
+This setup provides stateless authentication suitable for SPAs and WebSocket‑based UIs [web:193][web:208].
 
-5. Setup & Running Locally
-4.1 Prerequisites
-•	Java 17+
-•	Maven
-•	MySQL running locally (or accessible connection)
+### 3.6 Database Design and JPA
 
-4.2 Database Setup
-1.	Create a database:
-CREATE DATABASE chat_app;
-2.	Update application.yml (or application.properties) to match your MySQL credentials:
+- **Local profile (MySQL)**:
+  - `spring.jpa.hibernate.ddl-auto=update` during development.
+  - Messages and users persist across restarts.
+
+- **Render profile (H2 in‑memory)**:
+  - `ddl-auto=create` – schema created on each start.
+  - `data.sql` seeds initial rooms (e.g., General, Random, TechTalk).
+  - `spring.jpa.defer-datasource-initialization=true` ensures schema is created before `data.sql` runs [web:19][web:289].
+
+Entities use standard JPA annotations and Lombok to reduce boilerplate (`@Entity`, `@Id`, `@GeneratedValue`, `@ManyToOne`, `@Getter`, `@Setter`, etc.) [web:84].
+
+### 3.7 Online Users Tracking
+
+- `OnlineUserTracker` uses an in‑memory concurrent `Set<Long>` to track which user IDs are currently connected.
+- WebSocket STOMP connect/disconnect events are used to mark users online/offline (via headers containing the JWT).
+- `/api/users/online` returns the current set of online user IDs for use in the UI.
+
+This provides a simple presence mechanism appropriate for demos and small deployments [web:233][web:236].
+
+---
+
+## 4. Setup & Running
+
+### 4.1 Prerequisites
+
+- Java 17+
+- Maven
+- MySQL running locally (for `local` profile) or access to a MySQL instance
+
+### 4.2 Local Run with MySQL (`local` profile)
+
+1. **Create database** (example):
+
+CREATE DATABASE ChatApp;
+
+text
+
+2. **Configure `application.yml`** (local section) with your MySQL credentials:
+
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/chat_app
-    username: your_mysql_user
-    password: your_mysql_password
-    driver-class-name: com.mysql.cj.jdbc.Driver
+datasource:
+url: jdbc:mysql://localhost:3306/ChatApp?createDatabaseIfNotExist=true
+username: your_mysql_user
+password: your_mysql_password
+driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+text
+ jpa:
+   hibernate:
+     ddl-auto: update
+   show-sql: true
+   properties:
+     hibernate:
+       format_sql: true
+text
 
-4.3 Run the Application
+3. **Build and run**:
 
-  mvn spring-boot:run
+mvn clean package -DskipTests
+java -jar target/ChatApp-0.0.1-SNAPSHOT.jar
 
-The app will start on http://localhost:8080.
+text
 
+4. **Use the app**:
 
+- Open `http://localhost:8080/index.html`.
+- Register a new user, then log in.
+- After login, you are redirected to `chat.html`:
+  - Select a public room, send messages.
+  - Use the “Private (debug)” section to send a private message by entering another user’s numeric userId.
 
-4.4 Using the App
-•	Open http://localhost:8080/index.html in a browser.
-•	Register a new user, then log in.
-•	On successful login, you are redirected to chat.html.
-•	On chat.html:
-o	Select a room from the room list (pre-seeded rooms can be inserted via SQL or created via code).
-o	Type messages in the main input to send public messages to that room.
-o	Use the “Private (debug)” section: enter another user’s userId and send a private message (visible only to the sender and receiver).
- 
+### 4.3 Running with Docker
 
+1. **Build JAR and Docker image**:
 
-5. Assumptions & Simplifications
-   
-Protocol and environment
+mvn clean package -DskipTests
+docker build -t kadyan25/chatapp:latest .
 
-The application is developed and run over plain HTTP on localhost for this assignment.
-The JWT secret and other configuration values are kept directly in application config files for simplicity.
+text
 
-Error handling
+2. **Run container**:
 
-Error responses are simple, mostly using generic messages and default Spring error formats.
-Detailed error codes, localization, and custom error pages are not implemented.
+- With MySQL (`local` profile, assuming DB is reachable):
 
-Private messaging and rooms
+  ```
+  docker run -p 8080:8080 kadyan25/chatapp:latest
+  ```
 
-Private messages are modeled as messages with a sender and a receiver; the room field for these messages may be null or mapped in a simple way, and is not used to distinguish different private conversations.
-The private messaging UI uses a minimal “debug” style, where the user enters the numeric userId of the receiver manually.
+- With H2 (`render` profile, in‑memory DB):
 
-Online users tracking
+  ```
+  docker run -e "SPRING_PROFILES_ACTIVE=render" -p 8080:8080 kadyan25/chatapp:latest
+  ```
 
-Online users are tracked in memory only, using an OnlineUserTracker component, and are identified by their numeric user IDs.
-Persistence of online status or advanced status handling (idle/away) is not implemented.
+3. **Access the UI**:
 
-Frontend scope
+- `http://localhost:8080/index.html` – auth.
+- `http://localhost:8080/chat.html` – rooms.
+- `http://localhost:8080/private.html` – private chat.
 
-The frontend uses only plain HTML, CSS, and vanilla JavaScript, without any frameworks.
-UI focuses on clarity and basic responsiveness rather than on advanced design or animations.
+---
 
-Testing
+## 5. Assumptions & Simplifications
 
-Manual testing is used to verify flows such as registration, login, public chat, private chat, and message history.
-Automated tests (unit/integration) are not included in this version.
+- **Protocol & config**
+- Local development uses plain HTTP on `localhost`.
+- JWT secret and related values are stored in application configuration for simplicity; in production they should come from environment variables or a secrets manager [web:191].
 
+- **Error handling**
+- Error responses are mostly generic, using default Spring error formats.
+- No custom error pages or localization are implemented.
+
+- **Private messaging model**
+- Private messages are represented as `Message` entities with sender and receiver set, and room typically left null.
+- The private messaging UI in `chat.html` is a minimal debug helper; the main private experience is on `private.html`.
+
+- **Online status**
+- Online users are tracked only in memory, identified by numeric user IDs.
+- Persistence of online status and advanced presence states (idle/away) are not implemented [web:233].
+
+- **Frontend scope**
+- Plain HTML, CSS, and vanilla JS; no frontend frameworks or component libraries.
+- Design focuses on clarity and readability rather than advanced animations or themes.
+
+- **Testing**
+- Manual testing is used to verify flows: registration, login, room chat, private chat, and history.
+- Automated tests (unit/integration) are not included in this version [web:252].
+
+---

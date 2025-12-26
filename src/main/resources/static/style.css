@@ -146,6 +146,20 @@ button:hover {
 .chat-main-header h3 {
   font-size: 16px;
 }
+.app-header {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
 
 .messages-box {
   background: #f9fafb;

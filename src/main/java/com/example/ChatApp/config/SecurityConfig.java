@@ -41,7 +41,9 @@ public class SecurityConfig {
                 		        "/images/**",
                 		        "/webjars/**",
                 		        "/style.css",
-                		        "/h2-console/**"
+                		        "/h2-console/**",
+                		        "/private.html",
+                		        "/private.js"
                 		).permitAll()
 
                         .anyRequest().authenticated()

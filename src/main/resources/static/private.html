@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>ChatApp - Private Chat</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+        <div class="app-container">
+			<div class="app-header">
+			  <div class="header-left">
+			    <h2>Private Chat</h2>
+			    <span id="currentUser" class="current-user"></span>
+			  </div>
+			
+			  <a href="/chat.html" class="rooms-link">Rooms</a>
+			</div>
+
+
+            <div class="chat-layout">
+                <div class="sidebar">
+                    <h3>Peer</h3>
+                    <div class="form-group">
+                        <label for="peerId">Peer userId</label>
+                        <input type="number" id="peerId" placeholder="e.g. 2" />
+                    </div>
+                    <button onclick="loadPrivateHistory()">Load history</button>
+
+                    <div class="form-section" style="margin-top: 12px">
+                        <h3 style="font-size: 14px">Online users</h3>
+                        <div id="onlineUsers" class="status-message"></div>
+                    </div>
+                </div>
+
+                <div class="chat-main">
+                    <div class="chat-main-header">
+                        <h3>Chat with: <span id="currentPeerName">None</span></h3>
+                    </div>
+
+                    <div id="privateMessages" class="messages-box"></div>
+
+                    <div class="chat-input-row">
+                        <input type="text" id="privateMessageInput" placeholder="Type a private message" />
+                        <button onclick="sendPrivateMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+        <script src="/auth.js"></script>
+        <script src="/private.js"></script>
+    </body>
+</html>
