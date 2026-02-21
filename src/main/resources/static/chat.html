@@ -12,15 +12,16 @@
 <main class="app-shell">
     <header class="topbar">
         <div class="topbar-left">
-            <button class="icon-btn mobile-only" onclick="toggleSidebar()">Rooms</button>
+            <button class="icon-btn mobile-only nav-toggle-btn" onclick="toggleSidebar()">Open Rooms</button>
             <h2>Room Chat</h2>
         </div>
         <div class="topbar-right">
             <span id="currentUser" class="chip-user"></span>
-            <a class="top-link" href="/private.html">Private</a>
-            <button class="top-link top-link-button top-link-danger" type="button" onclick="logout()">Logout</button>
+            <a class="top-link desktop-only" href="/private.html">Private</a>
+            <button class="top-link top-link-button top-link-danger desktop-only" type="button" onclick="logout()">Logout</button>
         </div>
     </header>
+    <div class="mobile-nav-hint mobile-only">Tap <strong>Open Rooms</strong> to browse rooms and private chat options.</div>
 
     <div class="chat-layout">
         <aside id="roomSidebar" class="sidebar panel">
@@ -40,6 +41,10 @@
                 <h3>Private messages</h3>
                 <p class="helper-text">Pick a user to start a one-to-one conversation.</p>
                 <a class="top-link sidebar-note-link" href="/private.html">Open private chat</a>
+            </div>
+
+            <div class="form-section sidebar-actions mobile-only">
+                <button class="btn-primary sidebar-action-btn" type="button" onclick="logout()">Logout</button>
             </div>
         </aside>
 

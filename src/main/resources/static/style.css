@@ -253,6 +253,17 @@ input[type="number"] {
   font-weight: 700;
 }
 
+.nav-toggle-btn {
+  background: linear-gradient(135deg, var(--primary), #0ea5a1);
+  color: #ffffff;
+  border-color: #0c8279;
+  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35);
+}
+
+.nav-toggle-btn:hover {
+  background: linear-gradient(135deg, #0d6d66, #0b8d8a);
+}
+
 .chip-user {
   max-width: 130px;
   white-space: nowrap;
@@ -287,6 +298,16 @@ input[type="number"] {
   border-color: #f9b1b1;
   background: #ffe5e5;
   color: #b91c1c;
+}
+
+.mobile-nav-hint {
+  margin: 0.45rem 0.9rem 0.2rem;
+  padding: 0.48rem 0.62rem;
+  border-radius: 10px;
+  border: 1px dashed #9fcfd3;
+  background: #edf8ff;
+  font-size: 0.8rem;
+  color: #35535c;
 }
 
 .mobile-overlay {
@@ -399,6 +420,18 @@ input[type="number"] {
 
 .sidebar-note-link {
   margin-top: 0.1rem;
+}
+
+.sidebar-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.sidebar-action-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .user-list-item {
@@ -556,6 +589,10 @@ input[type="number"] {
   display: inline-flex;
 }
 
+.desktop-only {
+  display: none;
+}
+
 @media (min-width: 960px) {
   .auth-shell {
     padding: 1.35rem;
@@ -566,6 +603,14 @@ input[type="number"] {
   }
 
   .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: inline-flex;
+  }
+
+  .mobile-nav-hint {
     display: none;
   }
 
