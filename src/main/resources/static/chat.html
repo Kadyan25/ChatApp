@@ -2,52 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ChatApp - Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChatApp - Room Chat</title>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-<div class="app-container">
-    <div class="app-header">
-        <h2>ChatApp</h2>
-        <span id="currentUser"></span>
-    </div>
+<body class="page-chat">
+<div id="mobileOverlay" class="mobile-overlay" onclick="closeSidebar()"></div>
+
+<main class="app-shell">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="icon-btn mobile-only" onclick="toggleSidebar()">Rooms</button>
+            <h2>Room Chat</h2>
+        </div>
+        <div class="topbar-right">
+            <span id="currentUser" class="chip-user"></span>
+            <a class="top-link" href="/private.html">Private</a>
+            <button class="top-link top-link-button top-link-danger" type="button" onclick="logout()">Logout</button>
+        </div>
+    </header>
 
     <div class="chat-layout">
-        <!-- Sidebar: rooms -->
-        <div class="sidebar">
-            <h3>Rooms</h3>
-            <ul id="roomList"></ul>
-
-            <div class="form-section" style="margin-top:12px;">
-                <h3 style="font-size:14px;">Private (debug)</h3>
-                <div class="form-group">
-                    <label for="privateReceiverId">Receiver userId</label>
-                    <input type="number" id="privateReceiverId" placeholder="e.g. 2">
-                </div>
-                <div class="form-group">
-                    <label for="privateMessageInput">Private message</label>
-                    <input type="text" id="privateMessageInput" placeholder="Type private message">
-                </div>
-                <button onclick="sendPrivateMessage()">Send Private</button>
-                <a href="/private.html">Private chats</a>
+        <aside id="roomSidebar" class="sidebar panel">
+            <div class="panel-header">
+                <h3>Rooms</h3>
+                <button class="icon-btn mobile-only" onclick="closeSidebar()">Close</button>
             </div>
-        </div>
 
-        <!-- Main chat area -->
-        <div class="chat-main">
+            <div class="form-group sidebar-search-wrap">
+                <label for="roomSearchInput">Search rooms</label>
+                <input type="text" id="roomSearchInput" class="sidebar-search" placeholder="Search by room name">
+            </div>
+
+            <ul id="roomList" class="room-list"></ul>
+
+            <div class="form-section sidebar-note">
+                <h3>Private messages</h3>
+                <p class="helper-text">Pick a user to start a one-to-one conversation.</p>
+                <a class="top-link sidebar-note-link" href="/private.html">Open private chat</a>
+            </div>
+        </aside>
+
+        <section class="chat-main">
             <div class="chat-main-header">
-                <h3>Current room: <span id="currentRoomName">None</span></h3>
+                <h3 id="currentRoomName">Select a room</h3>
             </div>
 
             <div id="messages" class="messages-box"></div>
 
             <div class="chat-input-row">
-                <input type="text" id="messageInput" placeholder="Type a message">
-                <button onclick="sendMessage()">Send</button>
+                <input type="text" id="messageInput" placeholder="Type your message">
+                <button class="btn-primary" onclick="sendMessage()">Send</button>
             </div>
-        </div>
+        </section>
     </div>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>

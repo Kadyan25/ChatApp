@@ -4,6 +4,17 @@ function saveAuth(userId, username, token) {
     localStorage.setItem('token', token);
 }
 
+function clearAuth() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('token');
+}
+
+function logout() {
+    clearAuth();
+    window.location.href = '/index.html';
+}
+
 function getAuth() {
     return {
         userId: Number(localStorage.getItem('userId')),
@@ -32,7 +43,13 @@ async function register() {
             return;
         }
 
-        resEl.textContent = 'Registered successfully. You can login now.';
+        resEl.textContent = 'Registered successfully. Please login.';
+        document.getElementById('loginUsername').value = username;
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('regPassword').value = '';
+        if (typeof showLogin === 'function') {
+            showLogin();
+        }
     } catch (e) {
         resEl.textContent = 'Error: ' + e.message;
     }

@@ -2,21 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChatApp - Auth</title>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-<div class="app-container">
-    <div class="app-header">
+<body class="page-auth">
+<main class="auth-shell">
+    <header class="auth-header">
         <h1>ChatApp</h1>
-    </div>
+        <p>Real-time rooms and private conversations in one place.</p>
+    </header>
 
-    <!-- Simple tabs -->
-    <div style="display:flex; gap:8px; margin-bottom:8px;">
-        <button onclick="showLogin()">Login</button>
-    </div>
-
-    <div id="registerSection" class="form-section">
+    <section id="registerSection" class="form-section auth-section" style="display:none;">
         <h3>Create account</h3>
         <div class="form-group">
             <label for="regUsername">Username</label>
@@ -28,13 +25,16 @@
         </div>
         <div class="form-group">
             <label for="regPassword">Password</label>
-            <input type="password" id="regPassword" placeholder="••••••••">
+            <input type="password" id="regPassword" placeholder="********">
         </div>
-        <button onclick="register()">Register</button>
+        <button class="btn-primary" onclick="register()">Register</button>
         <div id="regResult" class="status-message"></div>
-    </div>
+        <p class="auth-switch">Already have an account?
+            <button class="text-link-btn" type="button" onclick="showLogin()">Login</button>
+        </p>
+    </section>
 
-    <div id="loginSection" class="form-section" style="display:none;">
+    <section id="loginSection" class="form-section auth-section">
         <h3>Sign in</h3>
         <div class="form-group">
             <label for="loginUsername">Username</label>
@@ -42,13 +42,16 @@
         </div>
         <div class="form-group">
             <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••">
+            <input type="password" id="loginPassword" placeholder="********">
         </div>
-        <button onclick="login()">Login</button>
+        <button class="btn-primary" onclick="login()">Login</button>
         <div id="loginResult" class="status-message"></div>
-        <p class="helper-text">On success you will be redirected to the chat.</p>
-    </div>
-</div>
+        <p class="helper-text">On success you will be redirected to room chat.</p>
+        <p class="auth-switch">New here?
+            <button class="text-link-btn" type="button" onclick="showRegister()">Register</button>
+        </p>
+    </section>
+</main>
 
 <script src="/auth.js"></script>
 <script>
@@ -56,6 +59,7 @@
         document.getElementById('registerSection').style.display = 'block';
         document.getElementById('loginSection').style.display = 'none';
     }
+
     function showLogin() {
         document.getElementById('registerSection').style.display = 'none';
         document.getElementById('loginSection').style.display = 'block';
